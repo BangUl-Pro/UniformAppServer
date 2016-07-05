@@ -106,22 +106,29 @@ app.post('/api/photo', function(req, res) {
 			console.log('파일 입력 path = ' + req.file.path);
 			console.log('파일 입력 size = ' + req.file.size);
 			console.log('파일 입력 parentId = ' + parentId);
+
+			if (req.file.fieldname && req.file.originalname && req.file.encoding &&
+				req.file.destination && req.file.filename && req.file.path &&
+				req.file.size && parentId) {
+
+				var inputData = {
+					'file_id' : req.file.filename,
+					'file_parent_id' : parentId
+				};
+				mySqlConnection.query('INSERT INTO files SET ?', inputData, function(err) {
+					if (err) {
+						console.log('파일 입력 에러 = ' + err);
+						res.writeHead(201);
+						res.end('에러');
+					} else {
+						console.log('파일 입력 성공');
+						res.writeHead(200);
+						res.end('성공');
+					}
+				});
+			}
 			
-			var inputData = {
-				'file_id' : req.file.filename,
-				'file_parent_id' : parentId
-			};
-			mySqlConnection.query('INSERT INTO files SET ?', inputData, function(err) {
-				if (err) {
-					console.log('파일 입력 에러 = ' + err);
-					res.writeHead(201);
-					res.end('에러');
-				} else {
-					console.log('파일 입력 성공');
-					res.writeHead(200);
-					res.end('성공');
-				}
-			});
+			
 			
 //			fs.writeFile('images', req.file, 'utf-8', function(err) {
 //				if (err) {
@@ -142,7 +149,7 @@ app.get('/imgs/:fileName', function(req, res) {
 			console.error('get ./images Error = ' + err);
 		} else {
 			console.log('./images = ' + data);
-			
+
 			fs.readFile('./images/' + req.params.fileName, function(err, fileData) {
 				if (err) {
 					console.log('error = ' + err);
@@ -1236,14 +1243,14 @@ io.on('connection', function(socket) {
 				'code' : 510
 			});
 		} else {
-mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = ' + userId + ' AND timelines.timeline_school_id = ' + school_id
+			mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = ' + userId + ' AND timelines.timeline_school_id = ' + schoolId
 					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = ' + userId
 					+ ' LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
 				if (err) {
 					console.error('내가 쓴 타임라인 요청 에러 = ' + err);
 					socket.emit('getMyTimeline', {
 						'code' : 511
-					});
+					}); 
 				} else {
 					console.log('내가 쓴 타임라인 요청 성공');
 					socket.emit('getMyTimeline', {
