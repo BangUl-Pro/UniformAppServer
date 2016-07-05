@@ -276,7 +276,7 @@ function signIn (socket, data) {
 						'userType' : userType
 					});
 				} else {
-					mySqlConnection.query('SELECT * FROM users WHERE user_id = ' + user_id, function(err, result) {
+					mySqlConnection.query('SELECT * FROM users WHERE user_id = "' + user_id + '"', function(err, result) {
 						if (err) {
 							console.log('회원가입 DB 에러 = ' + err);
 							socket.emit('signUp', {
@@ -313,7 +313,7 @@ function signIn (socket, data) {
 						'userType' : userType
 					});
 				} else {
-					mySqlConnection.query('SELECT * FROM users WHERE user_id = ' + user_id, function(err, userResult) {
+					mySqlConnection.query('SELECT * FROM users WHERE user_id = "' + user_id + '"', function(err, userResult) {
 						if (err) {
 							console.info('회원가입 쿼리에러 = ' + err);
 							socket.emit('signUp', {
@@ -390,7 +390,7 @@ io.on('connection', function(socket) {
 				'user_device_id' : deviceId
 			};
 
-			mySqlConnection.query('UPDATE users SET ? WHERE user_id = ' + id, inputData, function(err) {
+			mySqlConnection.query('UPDATE users SET ? WHERE user_id = "' + id + '"', inputData, function(err) {
 				if (err) {
 					console.log('setDeviceId 에러 : ' + err);
 					socket.emit('setDeviceId', {
@@ -729,7 +729,7 @@ io.on('connection', function(socket) {
 				'user_token' : token
 			};
 
-			mySqlConnection.query('UPDATE users SET ? WHERE user_id = ' + id, inputData, function(err) {
+			mySqlConnection.query('UPDATE users SET ? WHERE user_id = "' + id + '"', inputData, function(err) {
 				if (err) {
 					console.log('setToken 에러 : ' + err);
 					socket.emit('setToken', {
@@ -759,7 +759,7 @@ io.on('connection', function(socket) {
 				'code' : 999
 			});
 		} else {
-			mySqlConnection.query('SELECT user_token FROM users WHERE user_id = ' + id, function(err, result) {
+			mySqlConnection.query('SELECT user_token FROM users WHERE user_id = "' + id + '"', function(err, result) {
 				if (err) {
 					console.log('sendGcm 에러 : ' + err);
 					socket.emit('sendGcm', {
@@ -1005,14 +1005,14 @@ io.on('connection', function(socket) {
 				'user_school_id' : schoolId
 			};
 			
-			mySqlConnection.query('UPDATE users SET ? WHERE user_id = ' + id, userData, function(err) {
+			mySqlConnection.query('UPDATE users SET ? WHERE user_id = "' + id + '"', userData, function(err) {
 				if (err) {
 					console.log('유저 프로필 업데이트 에러 = ' + err);
 					socket.emit('updateUserProfile', {
 						'code' : 461
 					});
 				} else {
-					mySqlConnection.query('SELECT * FROM users WHERE user_id = ' + id, function(err, result) {
+					mySqlConnection.query('SELECT * FROM users WHERE user_id = "' + id + '"', function(err, result) {
 						if (err) {
 							console.log('유저 프로필 업데이트 에러 = ' + err);
 							socket.emit('updateUserProfile', {
@@ -1210,8 +1210,8 @@ io.on('connection', function(socket) {
 			});
 		} else {
 			mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = users.user_id AND timelines.timeline_school_id = ' + school_id
-					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = ' + userId
-					+ ' LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
+					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = "' + userId
+					+ '" LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
 				if (err) {
 					console.error('타임라인 모두 받아오기 에러 = ' + err);
 					socket.emit('getAllTimeline', {
@@ -1244,8 +1244,8 @@ io.on('connection', function(socket) {
 			});
 		} else {
 			mySqlConnection.query('SELECT * FROM timelines INNER JOIN users ON timelines.timeline_user_id = "' + userId + '" AND timelines.timeline_school_id = ' + schoolId
-					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = ' + userId
-					+ ' LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
+					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = "' + userId
+					+ '" LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
 				if (err) {
 					console.error('내가 쓴 타임라인 요청 에러 = ' + err);
 					socket.emit('getMyTimeline', {
@@ -1349,7 +1349,7 @@ io.on('connection', function(socket) {
 				'code': 540
 			});
 		} else {
-			mySqlConnection.query('DELETE FROM timelines WHERE timeline_user_id = ' + userId + ' AND timeline_id = ' + timelineId + ';', function(err) {
+			mySqlConnection.query('DELETE FROM timelines WHERE timeline_user_id = "' + userId + '" AND timeline_id = ' + timelineId + ';', function(err) {
 				if (err) {
 					console.error('타임라인 지우기 에러 = ' + err);
 					socket.emit('deleteTimeline', {
@@ -1397,7 +1397,7 @@ io.on('connection', function(socket) {
 			var updateData = {
 				'timeline_content' : content
 			};
-			mySqlConnection.query('UPDATE timelines SET ? WHERE timeline_id = ' + id + ' AND timeline_user_id = ' + userId, updateData, function(err) {
+			mySqlConnection.query('UPDATE timelines SET ? WHERE timeline_id = ' + id + ' AND timeline_user_id = "' + userId + '"', updateData, function(err) {
 				if (err) {
 					console.error('타임라인 업데이트 에러 = ' + err);
 					socket.emit('updateTimeline', {
@@ -1451,7 +1451,7 @@ io.on('connection', function(socket) {
 					});
 				} else {
 					console.log('좋아요 입력 성공');
-					mySqlConnection.query('SELECT * FROM likes WHERE like_timeline_id = ' + timelineItemId + ' AND like_user_id = ' + userId + ' LIMIT 1;', function(err, likeResult) {
+					mySqlConnection.query('SELECT * FROM likes WHERE like_timeline_id = ' + timelineItemId + ' AND like_user_id = "' + userId + '" LIMIT 1;', function(err, likeResult) {
 						if (err) {
 							console.error('좋아요 입력 쿼리 에러 = ' + err);
 							socket.emit('insertLike', {
@@ -1487,7 +1487,7 @@ io.on('connection', function(socket) {
 				'code' : 570
 			});
 		} else {
-			mySqlConnection.query('DELETE FROM likes WHERE like_id = ' + id + ' AND like_timeline_id = ' + timelineId + ' AND like_user_id = ' + userId, function(err) {
+			mySqlConnection.query('DELETE FROM likes WHERE like_id = ' + id + ' AND like_timeline_id = ' + timelineId + ' AND like_user_id = "' + userId + '"', function(err) {
 				if (err) {
 					console.error('좋아요 지우기 에러 = ' + err);
 					socket.emit('deleteLike', {
@@ -1520,7 +1520,7 @@ io.on('connection', function(socket) {
 				'code' : 580
 			});
 		} else {
-			mySqlConnection.query('DELETE FROM comments WHERE comment_id = ' + id + ' AND comment_timeline_item_id = ' + timelineItemId + ' AND comment_user_id = ' + userId, function(err) {
+			mySqlConnection.query('DELETE FROM comments WHERE comment_id = ' + id + ' AND comment_timeline_item_id = ' + timelineItemId + ' AND comment_user_id = "' + userId + '"', function(err) {
 				if (err) {
 					console.error('댓글 지우기 에러 = ' + err);
 					socket.emit('deleteComment', {
@@ -1929,7 +1929,7 @@ io.on('connection', function(socket) {
 					});
 					mySqlConnection.rollback();
 				} else {
-					mySqlConnection.query('DELETE FROM users WHERE user_id = ' + userId, function(err) {
+					mySqlConnection.query('DELETE FROM users WHERE user_id = "' + userId + '"', function(err) {
 						if (err) {
 							console.log('회원 탈퇴 에러 = ' + err);
 							socket.emit('deleteUser', {
@@ -1937,7 +1937,7 @@ io.on('connection', function(socket) {
 							});
 							mySqlConnection.rollback();
 						} else {
-							mySqlConnection.query('DELETE FROM transactions WHERE transaction_donator_id = ' + userId, function(err) {
+							mySqlConnection.query('DELETE FROM transactions WHERE transaction_donator_id = "' + userId + '"', function(err) {
 								if (err) {
 									console.log('회원 탈퇴 에러 = ' + err);
 									socket.emit('deleteUser', {
@@ -1945,7 +1945,7 @@ io.on('connection', function(socket) {
 									});
 									mySqlConnection.rollback();
 								} else {
-									mySqlConnection.query('DELETE FROM timelines WHERE timeline_user_id = ' + userId, function(err) {
+									mySqlConnection.query('DELETE FROM timelines WHERE timeline_user_id = "' + userId + '"', function(err) {
 										if (err) {
 											console.log('회원 탈퇴 에러 = ' + err);
 											socket.emit('deleteUser', {
@@ -1953,7 +1953,7 @@ io.on('connection', function(socket) {
 											});
 											mySqlConnection.rollback();
 										} else {
-											mySqlConnection.query('DELETE FROM products WHERE product_user_id = ' + userId, function(err) {
+											mySqlConnection.query('DELETE FROM products WHERE product_user_id = "' + userId + '"', function(err) {
 												if (err) {
 													console.log('회원 탈퇴 에러 = ' + err);
 													socket.emit('deleteUser', {
@@ -1961,7 +1961,7 @@ io.on('connection', function(socket) {
 													});
 													mySqlConnection.rollback();
 												} else {
-													mySqlConnection.query('DELETE FROM comments WHERE comment_user_id = ' + userId, function(err) {
+													mySqlConnection.query('DELETE FROM comments WHERE comment_user_id = "' + userId + '"', function(err) {
 														if (err) {
 															console.log('회원 탈퇴 에러 = ' + err);
 															socket.emit('deleteUser', {
@@ -1969,7 +1969,7 @@ io.on('connection', function(socket) {
 															});
 															mySqlConnection.rollback();
 														} else {
-															mySqlConnection.query('DELETE FROM likes WHERE like_user_id = ' + userId, function(err) {
+															mySqlConnection.query('DELETE FROM likes WHERE like_user_id = "' + userId + '"', function(err) {
 																if (err) {
 																	console.log('회원 탈퇴 에러 = ' + err);
 																	socket.emit('deleteUser', {
