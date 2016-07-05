@@ -1236,13 +1236,9 @@ io.on('connection', function(socket) {
 				'code' : 510
 			});
 		} else {
-			mySqlConnection.query('SELECT * FROM ' +
-				'(timelines LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND ' +
-				'likes.like_user_id = ' + userId +
-				' LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id) ' +
-				'JOIN users ON timelines.timeline_user_id = users.user_id ' +
-				'AND timelines.timeline_school_id = ' + schoolId +
-				' AND timelines.timeline_user_id = ' + userId + ' ORDER BY timelines.timeline_id;', function(err, timelineResult) {
+mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = ' + userId + ' AND timelines.timeline_school_id = ' + school_id
+					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = ' + userId
+					+ ' LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
 				if (err) {
 					console.error('내가 쓴 타임라인 요청 에러 = ' + err);
 					socket.emit('getMyTimeline', {
