@@ -1250,9 +1250,9 @@ io.on('connection', function(socket) {
 					console.error('내가 쓴 타임라인 요청 에러 = ' + err);
 					socket.emit('getMyTimeline', {
 						'code' : 511
-					}); 
+					});
 				} else {
-					console.log('내가 쓴 타임라인 요청 성공');
+					console.log('내가 쓴 타임라인 요청 성공 ' + JSON.stringify(timelineResult));
 					socket.emit('getMyTimeline', {
 						'code' : 200,
 						'timeline' : timelineResult
