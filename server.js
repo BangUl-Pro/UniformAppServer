@@ -793,11 +793,11 @@ io.on('connection', function(socket) {
 	});
 	
 	socket.on('getSchoolRanking', function(data) {
-		var from = data;
+		var index = data.index;
 		
 		// 학교 랭킹 요청
 		console.log('학교랭킹 요청');
-		mySqlConnection.query('select * from schools ORDER BY school_point DESC', function(err, result) {
+		mySqlConnection.query('select * from schools ORDER BY school_point DESC LIMIT 20 OFFSET ' + index * 20, function(err, result) {
 			if (err) {
 				console.error('학교랭킹 요청 에러 = ' + err);
 				socket.emit('getSchoolRanking', {
@@ -806,6 +806,32 @@ io.on('connection', function(socket) {
 			} else {
 				console.info('학교 랭킹 요청 성공');
 				socket.emit('getSchoolRanking', {
+					'code' : 200,
+					'school' : result
+				});
+			}
+		});
+	});
+
+	socket.on('getMySchoolRanking', function(data) {
+		var schoolId = data.school_id;
+		
+		// 학교 랭킹 요청
+		console.log('학교랭킹 요청');
+		mySqlConnection.query('set @a=0;', function(err) {
+			if (err) {
+				console.log('set @a=0 error ' + err);
+			}
+		});
+		mySqlConnection.query('select @a:=@a+1 AS rownum, col1, col2, col3 from schools ORDER BY school_point;', function(err, result) {
+			if (err) {
+				console.error('학교랭킹 요청 에러 = ' + err);
+				socket.emit('getMySchoolRanking', {
+					'code' : 430
+				});
+			} else {
+				console.info('학교 랭킹 요청 성공');
+				socket.emit('getMySchoolRanking', {
 					'code' : 200,
 					'school' : result
 				});
