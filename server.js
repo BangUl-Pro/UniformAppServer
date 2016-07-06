@@ -835,20 +835,21 @@ io.on('connection', function(socket) {
 		var schoolId = data.school_id;
 		
 		// 학교 랭킹 요청
-		console.log('학교랭킹 요청');
+		console.log('내 학교랭킹 요청');
 		mySqlConnection.query('set @a=0;', function(err) {
 			if (err) {
 				console.log('set @a=0 error ' + err);
 			}
 		});
-		mySqlConnection.query('select @a:=@a+1 AS school_point from schools ORDER BY school_point;', function(err, result) {
+		
+		mySqlConnection.query('SELECT A FROM (SELECT @a:=@a+1 AS ROWNUM FROM schools, (SELECT @a:=0) R ORDER BY school_point), schools A WHERE schools.schoolId = ' + schoolId +';', function(err, result) {
 			if (err) {
-				console.error('학교랭킹 요청 에러 = ' + err);
+				console.error('내 학교랭킹 요청 에러 = ' + err);
 				socket.emit('getMySchoolRanking', {
 					'code' : 430
 				});
 			} else {
-				console.info('학교 랭킹 요청 성공');
+				console.info('내 학교 랭킹 요청 성공 = ' + JSON.stringify(result));
 				socket.emit('getMySchoolRanking', {
 					'code' : 200,
 					'school' : result
