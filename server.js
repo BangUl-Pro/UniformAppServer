@@ -542,6 +542,24 @@ io.on('connection', function(socket) {
 		});
 	});
 	
+
+	socket.on('dropKakao', function(data) {
+		mySqlConnection.query('DELETE FROM kakaos', function(err) {
+			if (err) {
+				console.error('카카오 테이블 값 삭제 에러 = ' + err);
+			} else {
+				console.log('카카오 테이블 값 삭제 완료');
+			}
+		});
+		
+		mySqlConnection.query('DROP TABLE kakaos', function(err) {
+			if (err) {
+				console.error('카카오 테이블 삭제 에러 = ' + err);
+			} else {
+				console.log('카카오 테이블 삭제 성공');
+			}
+		});
+	});
 	
 	socket.on('dropTransaction', function(data) {
 		mySqlConnection.query('DELETE FROM transactions', function(err) {
