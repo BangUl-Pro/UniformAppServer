@@ -852,7 +852,7 @@ io.on('connection', function(socket) {
 				console.info('내 학교 랭킹 요청 성공 = ' + JSON.stringify(result));
 				socket.emit('getMySchoolRanking', {
 					'code' : 200,
-					'school' : result
+					'school' : result[0]
 				});
 			}
 		});
