@@ -841,7 +841,7 @@ io.on('connection', function(socket) {
 				console.log('set @a=0 error ' + err);
 			}
 		});
-		mySqlConnection.query('select @a:=@a+1 AS rownum, col1, col2, col3 from schools ORDER BY school_point;', function(err, result) {
+		mySqlConnection.query('select @a:=@a+1 AS school_point from schools ORDER BY school_point;', function(err, result) {
 			if (err) {
 				console.error('학교랭킹 요청 에러 = ' + err);
 				socket.emit('getMySchoolRanking', {
