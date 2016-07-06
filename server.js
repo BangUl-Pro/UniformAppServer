@@ -430,7 +430,7 @@ io.on('connection', function(socket) {
 	
 	socket.on('createUser', function(data) {
 		// 유저 db 생성
-		mySqlConnection.query('create table if not exists users (user_id VARCHAR(100) NOT NULL, user_name TEXT, user_has_extra_profile BOOLEAN NOT NULL, user_phone TEXT, user_picture TEXT, user_real_name TEXT, user_school_id INT, user_sex INT, user_user_type INT, kakao_thumbnail_image TEXT, kakao_profile_image TEXT, kakao_nickname TEXT, kakao_id INT, PRIMARY KEY (user_id));', function(err, result) {
+		mySqlConnection.query('create table if not exists users (user_id VARCHAR(100) NOT NULL, user_name TEXT, user_has_extra_profile BOOLEAN NOT NULL, user_phone TEXT, user_picture TEXT, user_real_name TEXT, user_school_id INT, user_sex INT, user_user_type INT, user_token TEXT, user_device_id VARCHAR(100), kakao_thumbnail_image TEXT, kakao_profile_image TEXT, kakao_nickname TEXT, kakao_id INT, PRIMARY KEY (user_id));', function(err, result) {
 			if (err) {
 				console.error('user db 생성 에러 = ' + err);
 			} else {
@@ -528,6 +528,16 @@ io.on('connection', function(socket) {
 				console.error('트랜잭션 테이블 생성 에러 = ' + err);
 			} else {
 				console.log('트랜잭션 테이블 생성 성공');
+			}
+		});
+	});
+
+	socket.on('createToken', function(data) {
+		mySqlConnection.query('ALTER TABLE users ADD COLUMN user_token TEXT;', function(err) {
+			if (err) {
+				console.log("token 컬럼 추가 실패. = " + err);
+			} else {
+				console.log('token 컬럼 추가 성공.');
 			}
 		});
 	});
@@ -699,16 +709,6 @@ io.on('connection', function(socket) {
 				}
 			});
 		}
-	});
-	
-	socket.on('addToken', function(data) {
-		mySqlConnection.query('ALTER TABLE users ADD COLUMN user_token TEXT;', function(err) {
-			if (err) {
-				console.log("token 컬럼 추가 실패. = " + err);
-			} else {
-				console.log('token 컬럼 추가 성공.');
-			}
-		});
 	});
 
 	socket.on('setToken', function(data) {
