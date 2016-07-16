@@ -34,19 +34,6 @@ var ImageSchema = new Schema({
 var Grid = require('gridfs-stream');
 Grid.mongo = mongoose.mongo;
 
-mongooseConn.once('open', function() {
-	console.log('open');
-	var gfs = Grid(mongooseConn.db);
-
-	var writestream = gfs.createWriteStream({
-		filename: 'test.txt'
-	});
-	fs.createReadStream('home/etech/sourcefile.txt').pipe(writestream);
-	writestream.on('close', function(file) {
-		console.log(file.filename + ' Written to db');
-	})
-});
-
 // MYSQL
 var mySql = require('mysql');
 var mySqlConnection = mySql.createConnection(process.env.JAWSDB_URL); 
@@ -159,6 +146,19 @@ app.post('/api/photo', function(req, res) {
 						console.log('파일 입력 성공');
 						res.writeHead(200);
 						res.end('성공');
+
+						mongooseConn.once('open', function() {
+							console.log('open');
+							var gfs = Grid(mongooseConn.db);
+
+							var writestream = gfs.createWriteStream({
+								filename: req.file.filename
+							});
+							fs.createReadStream(req.file.path).pipe(writestream);
+							writestream.on('close', function(file) {
+								console.log(file.filename + ' Written to db');
+							})
+						});
 					}
 				});
 			}
