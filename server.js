@@ -33,6 +33,7 @@ var ImageSchema = new Schema({
 
 var Grid = require('gridfs-stream');
 Grid.mongo = mongoose.mongo;
+var gfs = Grid(mongooseConn.db);
 
 // MYSQL
 var mySql = require('mysql');
@@ -146,8 +147,6 @@ app.post('/api/photo', function(req, res) {
 						console.log('파일 입력 성공');
 						res.writeHead(200);
 						res.end('성공');
-
-						var gfs = Grid(mongooseConn.db);
 
 						var writestream = gfs.createWriteStream({
 							filename: req.file.filename
