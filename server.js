@@ -182,15 +182,25 @@ app.get('/imgs/:fileName', function(req, res) {
 		} else {
 			console.log('./images = ' + data);
 
-			fs.readFile('./images/' + req.params.fileName, function(err, fileData) {
-				if (err) {
-					console.log('error = ' + err);
-					res.writeHead(300, {'Content-Type' : 'text/html'});
-					res.end('error = ' + err);
-				} else { 
-					res.writeHead(200, {'Content-type' : 'image/png'});
-					res.end(fileData);
-				}
+			// fs.readFile('./images/' + req.params.fileName, function(err, fileData) {
+			// 	if (err) {
+			// 		console.log('error = ' + err);
+			// 		res.writeHead(300, {'Content-Type' : 'text/html'});
+			// 		res.end('error = ' + err);
+			// 	} else { 
+			// 		res.writeHead(200, {'Content-type' : 'image/png'});
+			// 		res.end(fileData);
+			// 	}
+			// });
+			var fs_write_stream = fs.createWriteStream('write.txt');
+ 
+			//read from mongodb
+			var readstream = gfs.createReadStream({
+			     filename: req.params.fileName
+			});
+			readstream.pipe(fs_write_stream);
+			fs_write_stream.on('close', function () {
+			     console.log('file has been written fully!');
 			});
 		}
 	});
