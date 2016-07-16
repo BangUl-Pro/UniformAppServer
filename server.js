@@ -179,7 +179,8 @@ app.get('/imgs/:fileName', function(req, res) {
 		if (err) {
 			console.error('get ./images Error = ' + err);
 		} else {
-			console.log('./images = ' + data);
+			// console.log('./images = ' + data);
+			console.log('./images = ' + req.params.fileName);
 
 			// fs.readFile('./images/' + req.params.fileName, function(err, fileData) {
 			// 	if (err) {
@@ -191,13 +192,16 @@ app.get('/imgs/:fileName', function(req, res) {
 			// 		res.end(fileData);
 			// 	}
 			// });
+
+
+
 			var fs_write_stream = fs.createWriteStream('write.txt');
  
 			//read from mongodb
 			var readstream = gfs.createReadStream({
 			     filename: req.params.fileName
 			});
-			readstream.pipe(fs_write_stream);
+			readstream.pipe(res);
 			fs_write_stream.on('close', function () {
 			     console.log('file has been written fully!');
 			});
