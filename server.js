@@ -842,7 +842,7 @@ io.on('connection', function(socket) {
 			}
 		});
 		
-		mySqlConnection.query('SELECT A.rank FROM (SELECT @a:=@a+1 AS rank, school_id FROM schools ORDER BY school_point) AS A WHERE A.school_id = ' + schoolId +';', function(err, result) {
+		mySqlConnection.query('SELECT A.rank FROM (SELECT @a:=@a+1 AS rank, school_id FROM schools ORDER BY school_point DESC) AS A WHERE A.school_id = ' + schoolId +';', function(err, result) {
 			if (err) {
 				console.error('내 학교랭킹 요청 에러 = ' + err);
 				socket.emit('getMySchoolRanking', {
