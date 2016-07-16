@@ -11,6 +11,41 @@ app.get('/', function(req, res) {
 var io = require('socket.io').listen(server);
 var mongoose = require('mongoose');
 
+mongoose.connect('mongodb://ironfactory:12345678@ds027628.mlab.com:27628/heroku_95cncg3f', function(err) {
+	if (err) {
+		console.log('몽고 DB 연결 에러 = ' + err);
+	}
+});
+var mongooseConn = mongoose.connection;
+
+var Schema = mongoose.Schema;
+var ImageSchema = new Schema({
+	_id: Schema.Types.ObjectId,
+	length: Number,
+	chunckSize: Number,
+	uploadDate: {
+		type: Date,
+		default: Date.now
+	},
+	filename: String,
+	contentType: String
+});
+
+var Grid = require('gridfs-stream');
+Grid.mongo = mongoose.mongo;
+
+mongooseConn.once('open', function() {
+	console.log('open');
+	var gfs = Grid(mongooseConn.db);
+
+	var writestream = gfs.createWriteStream({
+		filename: 'test.txt'
+	});
+	fs.fs.createReadStream('home/etech/sourcefile.txt').pipe(writestream);
+	writestream.on('close', function(file) {
+		console.log(file.filename + ' Written to db');
+	})
+});
 
 // MYSQL
 var mySql = require('mysql');
