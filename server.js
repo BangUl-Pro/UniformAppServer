@@ -202,9 +202,7 @@ app.get('/imgs/:fileName', function(req, res) {
 			     filename: req.params.fileName
 			});
 			readstream.pipe(res);
-			fs_write_stream.on('close', function () {
-			     console.log('file has been written fully!');
-			});
+			
 		}
 	});
 });
