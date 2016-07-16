@@ -147,17 +147,14 @@ app.post('/api/photo', function(req, res) {
 						res.writeHead(200);
 						res.end('성공');
 
-						mongooseConn.once('open', function() {
-							console.log('open');
-							var gfs = Grid(mongooseConn.db);
+						var gfs = Grid(mongooseConn.db);
 
-							var writestream = gfs.createWriteStream({
-								filename: req.file.filename
-							});
-							fs.createReadStream(req.file.path).pipe(writestream);
-							writestream.on('close', function(file) {
-								console.log(file.filename + ' Written to db');
-							})
+						var writestream = gfs.createWriteStream({
+							filename: req.file.filename
+						});
+						fs.createReadStream(req.file.path).pipe(writestream);
+						writestream.on('close', function(file) {
+							console.log(file.filename + ' Written to db');
 						});
 					}
 				});
