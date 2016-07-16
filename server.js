@@ -41,7 +41,7 @@ mongooseConn.once('open', function() {
 	var writestream = gfs.createWriteStream({
 		filename: 'test.txt'
 	});
-	fs.fs.createReadStream('home/etech/sourcefile.txt').pipe(writestream);
+	fs.createReadStream('home/etech/sourcefile.txt').pipe(writestream);
 	writestream.on('close', function(file) {
 		console.log(file.filename + ' Written to db');
 	})
