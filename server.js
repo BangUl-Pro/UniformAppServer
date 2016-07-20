@@ -853,11 +853,10 @@ io.on('connection', function(socket) {
 	});
 	
 	socket.on('getSchoolRanking', function(data) {
-		var index = data.index;
 		
 		// 학교 랭킹 요청
 		console.log('학교랭킹 요청');
-		mySqlConnection.query('select * from schools ORDER BY school_point DESC LIMIT 20 OFFSET ' + index * 20, function(err, result) {
+		mySqlConnection.query('select * from schools ORDER BY school_point DESC LIMIT 150', function(err, result) {
 			if (err) {
 				console.error('학교랭킹 요청 에러 = ' + err);
 				socket.emit('getSchoolRanking', {
