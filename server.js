@@ -704,6 +704,21 @@ io.on('connection', function(socket) {
 			}
 		});
 	});
+
+	socket.on('resetSchoolRank', function(data) {
+		var inputData = {
+			'school_point' : 0
+		}
+
+		// 학교 db 제거
+		mySqlConnection.query('update schools SET ?', inputData, function(err, reulst) {
+			if (err) {
+				console.error('school db 제거 에러 = ' + err);
+			} else {
+				console.log('school db 제거');
+			}
+		});
+	});
 	
 	
 	socket.on('dropUser', function(data) {
