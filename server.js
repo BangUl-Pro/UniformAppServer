@@ -1298,6 +1298,9 @@ io.on('connection', function(socket) {
 				'code' : 500
 			});
 		} else {
+			if (!time) {
+				time = 0;
+			}
 			mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = users.user_id AND timelines.timeline_school_id = ' + school_id + ' AND timelines.timeline_created >= ' + time 
 					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = "' + userId
 					+ '" LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
