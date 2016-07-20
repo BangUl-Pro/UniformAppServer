@@ -1285,10 +1285,12 @@ io.on('connection', function(socket) {
 	socket.on('getAllTimeline', function(data) {
 		var school_id = data.school_id;
 		var userId = data.user_id;
+		var time = data.time;
 		
 		console.log('타임라인 모두 받아오기');
 		console.info('school_id = ' + school_id);
 		console.info('userId = ' + userId);
+		console.info('time = ' + time);
 		
 		if (!school_id || !userId) {
 			console.error('데이터 누락');
@@ -1296,7 +1298,7 @@ io.on('connection', function(socket) {
 				'code' : 500
 			});
 		} else {
-			mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = users.user_id AND timelines.timeline_school_id = ' + school_id
+			mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = users.user_id AND timelines.timeline_school_id = ' + school_id + ' AND timelines.timeline_created >= ' + time 
 					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = "' + userId
 					+ '" LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
 				if (err) {
