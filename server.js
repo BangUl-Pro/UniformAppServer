@@ -853,23 +853,43 @@ io.on('connection', function(socket) {
 	});
 	
 	socket.on('getSchoolRanking', function(data) {
-		
+		var schoolId = data.school_id;
+
+		console.log('schoolId = ' + schoolId);
+
 		// 학교 랭킹 요청
 		console.log('학교랭킹 요청');
-		mySqlConnection.query('select * from schools ORDER BY school_point DESC LIMIT 150', function(err, result) {
-			if (err) {
-				console.error('학교랭킹 요청 에러 = ' + err);
-				socket.emit('getSchoolRanking', {
-					'code' : 430
-				});
-			} else {
-				console.info('학교 랭킹 요청 성공');
-				socket.emit('getSchoolRanking', {
-					'code' : 200,
-					'school' : result
-				});
-			}
-		});
+		if (schoolId) {
+			mySqlConnection.query('select * from schools WHERE school_id = ' + schoolId, function(err, result) {
+				if (err) {
+					console.error('학교랭킹 요청 에러 = ' + err);
+					socket.emit('getSchoolRanking', {
+						'code' : 430
+					});
+				} else {
+					console.info('학교 랭킹 요청 성공');
+					socket.emit('getSchoolRanking', {
+						'code' : 200,
+						'school' : result
+					});
+				}
+			});
+		} else {
+			mySqlConnection.query('select * from schools ORDER BY school_point DESC LIMIT 150', function(err, result) {
+				if (err) {
+					console.error('학교랭킹 요청 에러 = ' + err);
+					socket.emit('getSchoolRanking', {
+						'code' : 430
+					});
+				} else {
+					console.info('학교 랭킹 요청 성공');
+					socket.emit('getSchoolRanking', {
+						'code' : 200,
+						'school' : result
+					});
+				}
+			});
+		}
 	});
 
 	socket.on('getMySchoolRanking', function(data) {
