@@ -93,26 +93,9 @@ var upload = multer({
 	putSingleFilesInArray : true
 }).single('uploaded_file');
 
-//app.use(upload());
 
-//app.use(multer({
-//	dest : './images/',
-//	rename : function(fieldName, fileName) {
-//		return Date.now();
-//	},
-//	onFileUploadComplete : function(file) {
-//		done = true;
-//	},
-//	inMemory : true,
-//	putSingleFilesInArray : true
-//}).array('photos', 12));
 
 app.post('/api/photo', function(req, res) {
-//	console.log('파일 업로드 시도');
-//	if (done) {
-//		console.log('파일 업로드 성공 = ' + req.files);
-//		res.send("파일 업로드 성공 \n" + req.files);
-//	}
 	upload(req, res, function(err) {
 		if (err) {
 			console.error('에러 = ' + err);
@@ -120,6 +103,7 @@ app.post('/api/photo', function(req, res) {
 			res.end('ss');
 		} else {
 			var parentId = req.headers.parent_id;
+			var type = req.headers.file_type;
 			console.log('파일 입력 ');
 			console.log('파일 입력 fieldname = ' + req.file.fieldname);
 			console.log('파일 입력 originalname = ' + req.file.originalname);
@@ -129,6 +113,7 @@ app.post('/api/photo', function(req, res) {
 			console.log('파일 입력 path = ' + req.file.path);
 			console.log('파일 입력 size = ' + req.file.size);
 			console.log('파일 입력 parentId = ' + parentId);
+			console.log('파일 입력 file_type = ' + type);
 
 			if (req.file.fieldname && req.file.originalname && req.file.encoding &&
 				req.file.destination && req.file.filename && req.file.path &&
@@ -136,7 +121,8 @@ app.post('/api/photo', function(req, res) {
 
 				var inputData = {
 					'file_id' : req.file.filename,
-					'file_parent_id' : parentId
+					'file_parent_id' : parentId,
+					'file_type' : type
 				};
 				mySqlConnection.query('INSERT INTO files SET ?', inputData, function(err) {
 					if (err) {
@@ -158,18 +144,6 @@ app.post('/api/photo', function(req, res) {
 					}
 				});
 			}
-			
-			
-			
-//			fs.writeFile('images', req.file, 'utf-8', function(err) {
-//				if (err) {
-//					console.error('write Error = ' + err);
-//				} else {
-//					console.log('write 성공');
-//					res.writeHead(200);
-//					res.end('dd');
-//				}
-//			});
 		}
 	});
 });
@@ -529,7 +503,7 @@ io.on('connection', function(socket) {
 	
 	
 	socket.on('createFile', function(data) {
-		mySqlConnection.query('CREATE TABLE IF NOT EXISTS files (file_id VARCHAR(100) PRIMARY KEY, file_parent_id TEXT);', function (err) {
+		mySqlConnection.query('CREATE TABLE IF NOT EXISTS files (file_id VARCHAR(100) PRIMARY KEY, file_parent_id TEXT, file_type INT);', function (err) {
 			if (err) {
 				console.error('파일 테이블 생성 에러 = ' + err);
 			} else {
@@ -1023,7 +997,7 @@ io.on('connection', function(socket) {
 			console.log('제품 검색 한다');
 			if (size == -1 && category == -1) {
 				mySqlConnection.query('SELECT * FROM files RIGHT OUTER JOIN (SELECT * FROM products JOIN transactions ON products.product_school_id = ' + school_id + ' AND products.product_sex = ' + sex + ' AND products.product_id = transactions.transaction_product_id LIMIT 10 OFFSET ' + (position - 1) * 10 + ')' +
-						'as products ON products.product_id = files.file_parent_id ORDER BY products.product_id;', function(err, productResult) {
+						'as products ON products.product_id = files.file_parent_id AND files.file_type = 1 ORDER BY products.product_id;', function(err, productResult) {
 					console.log('사이즈 전부, 카테고리 전부 검색');
 					if (err) {
 						console.error('제품 검색 에러 = ' + err);
@@ -1040,7 +1014,7 @@ io.on('connection', function(socket) {
 				});
 			} else if (size == -1) {
 				mySqlConnection.query('SELECT * FROM files RIGHT OUTER JOIN (SELECT * FROM products JOIN transactions ON products.product_school_id = ' + school_id + ' AND products.product_sex = ' + sex + ' AND products.product_id = transactions.transaction_product_id AND products.product_category = ' + category + ' LIMIT 10 OFFSET ' + (position - 1) * 10 + ')' +
-						'as products ON products.product_id = files.file_parent_id;', function(err, productResult) {
+						'as products ON products.product_id = files.file_parent_id AND files.file_type = 1;', function(err, productResult) {
 					console.log('사이즈 전부 검색');
 					if (err) {
 						console.error('제품 검색 에러 = ' + err);
@@ -1062,7 +1036,7 @@ io.on('connection', function(socket) {
 				' AND products.product_id = transactions.transaction_product_id' +
 				' AND products.product_size = ' + size +
 				' LIMIT 10 OFFSET ' + (position - 1) * 10 + ')' +
-				'as products ON products.product_id = files.file_parent_id;', function(err, productResult) {
+				'as products ON products.product_id = files.file_parent_id AND files.file_type = 1;', function(err, productResult) {
 					console.log('카테고리 전부 검색');
 					if (err) {
 						console.error('제품 검색 에러 = ' + err);
@@ -1081,7 +1055,7 @@ io.on('connection', function(socket) {
 				console.log('제품 검색 ㅇㅇ');
 				mySqlConnection.query('SELECT * FROM files RIGHT OUTER JOIN (SELECT * FROM products JOIN transactions ON products.product_school_id = ' + school_id + ' AND products.product_sex = ' + sex + 
 						' AND products.product_id = transactions.transaction_product_id AND products.product_size = ' + size + ' AND products.product_category = ' + category + ' LIMIT 10 OFFSET ' + (position - 1) * 10 + ')' +
-						'as products ON products.product_id = files.file_parent_id;', function(err, productResult) {
+						'as products ON products.product_id = files.file_parent_id AND files.file_type = 1;', function(err, productResult) {
 					if (err) {
 						console.error('제품 검색 에러 = ' + err);
 						socket.emit('searchProduct', {
@@ -1174,7 +1148,7 @@ io.on('connection', function(socket) {
 				' AND products.product_id = transactions.transaction_product_id' + 
 				' AND products.product_category = ' + category +
 				' AND products.product_created >= ' + created + ')' +
-				' as products ON products.product_id = files.file_parent_id;', function(err, productResult) {
+				' as products ON products.product_id = files.file_parent_id AND files.file_type = 1;', function(err, productResult) {
 					if (err) {
 						console.error('getProduct 에러 = ' + err);
 						socket.emit('getProduct', {
@@ -1333,7 +1307,8 @@ io.on('connection', function(socket) {
 			}
 			mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = users.user_id AND timelines.timeline_school_id = ' + school_id + ' AND timelines.timeline_created >= ' + time 
 					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = "' + userId
-					+ '" LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
+					+ '" LEFT JOIN files ON files.file_parent_id = timelines.timeline_id AND'
+					+ ' files.file_type = 2 ORDER BY timelines.timeline_id', function(err, timelineResult) {
 				if (err) {
 					console.error('타임라인 모두 받아오기 에러 = ' + err);
 					socket.emit('getAllTimeline', {
@@ -1367,7 +1342,8 @@ io.on('connection', function(socket) {
 		} else {
 			mySqlConnection.query('SELECT * FROM timelines INNER JOIN users ON timelines.timeline_user_id = "' + userId + '" AND timelines.timeline_school_id = ' + schoolId + ' AND timelines.timeline_user_id = users.user_id'
 					+ ' LEFT JOIN likes ON timelines.timeline_id = likes.like_timeline_id AND likes.like_user_id = "' + userId
-					+ '" LEFT JOIN files ON files.file_parent_id = timelines.timeline_id ORDER BY timelines.timeline_id', function(err, timelineResult) {
+					+ '" LEFT JOIN files ON files.file_parent_id = timelines.timeline_id AND' +
+					' files.file_type = 2 ORDER BY timelines.timeline_id', function(err, timelineResult) {
 				if (err) {
 					console.error('내가 쓴 타임라인 요청 에러 = ' + err);
 					socket.emit('getMyTimeline', {
@@ -1752,7 +1728,7 @@ io.on('connection', function(socket) {
 			});
 		} else {
 			mySqlConnection.query('SELECT * FROM files RIGHT OUTER JOIN (SELECT * FROM products JOIN transactions ON (products.product_id = transactions.transaction_product_id) AND (transactions.transaction_receiver_id = ' + receiverId + ' OR transactions.transaction_donator_id = ' + donatorId + '))' +
-					'as products ON products.product_id = files.file_parent_id ORDER BY products.product_id;', function(err, productResult) {
+					'as products ON products.product_id = files.file_parent_id AND files.file_type = 1 ORDER BY products.product_id;', function(err, productResult) {
 				if (err) {
 					console.error('내 제품 요청 에러 = ' + err);
 					socket.emit('getMyProduct', {
