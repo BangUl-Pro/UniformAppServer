@@ -179,7 +179,6 @@ app.get('/imgs/:fileName', function(req, res) {
 		if (err) {
 			console.error('get ./images Error = ' + err);
 		} else {
-			// console.log('./images = ' + data);
 			console.log('./images = ' + req.params.fileName);
 
 			// fs.readFile('./images/' + req.params.fileName, function(err, fileData) {
@@ -195,13 +194,14 @@ app.get('/imgs/:fileName', function(req, res) {
 
 
 
-			var fs_write_stream = fs.createWriteStream('write.txt');
+			// var fs_write_stream = fs.createWriteStream('write.txt');
  
 			//read from mongodb
 			var readstream = gfs.createReadStream({
 			     filename: req.params.fileName
 			});
 			readstream.pipe(res);
+			console.log('image 로딩 성공.');
 		}
 	});
 });
