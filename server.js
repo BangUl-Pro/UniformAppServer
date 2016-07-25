@@ -181,35 +181,23 @@ app.get('/imgs/:fileName', function(req, res) {
 		} else {
 			console.log('./images = ' + req.params.fileName);
 
-			// fs.readFile('./images/' + req.params.fileName, function(err, fileData) {
-			// 	if (err) {
-			// 		console.log('error = ' + err);
-			// 		res.writeHead(300, {'Content-Type' : 'text/html'});
-			// 		res.end('error = ' + err);
-			// 	} else { 
-			// 		res.writeHead(200, {'Content-type' : 'image/png'});
-			// 		res.end(fileData);
-			// 	}
-			// });
-
-
-
-			// var fs_write_stream = fs.createWriteStream('write.txt');
- 
-			//read from mongodb
-			var readstream = gfs.createReadStream({
-			     filename: req.params.fileName
-			}, function(err) {
+			gfs.exist({filename: req.params.fileName}, function(err, found) {
 				if (err) {
-					console.log('readStream error = ' + err);
+					console.log('GFS Exist error = ' + err);
+					return;
 				}
-			});
-			readstream.pipe(res, function(err) {
-				if (err) {
-					console.log('pip error = ' + err);
+
+				if (!found) {
+					res.writeHead(200);
+					res.end('no image');
+					return;
 				}
+
+				gfs.createReadStream({
+				     filename: req.params.fileName
+				}).pipe(res);
+				console.log('image 로딩 성공.');
 			});
-			console.log('image 로딩 성공.');
 		}
 	});
 });
