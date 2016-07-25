@@ -199,8 +199,16 @@ app.get('/imgs/:fileName', function(req, res) {
 			//read from mongodb
 			var readstream = gfs.createReadStream({
 			     filename: req.params.fileName
+			}, function(err) {
+				if (err) {
+					console.log(err);
+				}
 			});
-			readstream.pipe(res);
+			readstream.pipe(res, function(err) {
+				if (err) {
+					console.log(err);
+				}
+			});
 			console.log('image 로딩 성공.');
 		}
 	});
