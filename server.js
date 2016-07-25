@@ -201,12 +201,12 @@ app.get('/imgs/:fileName', function(req, res) {
 			     filename: req.params.fileName
 			}, function(err) {
 				if (err) {
-					console.log(err);
+					console.log('readStream error = ' + err);
 				}
 			});
 			readstream.pipe(res, function(err) {
 				if (err) {
-					console.log(err);
+					console.log('pip error = ' + err);
 				}
 			});
 			console.log('image 로딩 성공.');
