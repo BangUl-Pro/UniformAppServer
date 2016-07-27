@@ -756,6 +756,35 @@ io.on('connection', function(socket) {
 		}
 	});
 
+	socket.on('setHasExtraProfile', function(data) {
+		var user_id = data.id;
+		var hasExtraProfile = data.hasExtraProfile;
+
+		if (!user_id || !hasExtraProfile) {
+			console.log("데이터 누락.");
+			socket.emit('setHasExtraProfile', {
+				'code' : 500
+			});
+		} else {
+			var inputData = {
+				'user_has_extra_profile': hasExtraProfile
+			}
+			mySqlConnection.query('UPDATE users SET ? WHERE user_id = "' + user_id + '"', inputData, function(err) {
+				if (err) {
+					console.log(err);
+					socket.emit('setHasExtraProfile', {
+						'code' : 501
+					});
+				} else {
+					console.log('성공.');
+					socket.emit('setHasExtraProfile', {
+						'code' : 200
+					});
+				}
+			});
+		}
+	});
+
 	socket.on('setToken', function(data) {
 		var id = data.id;
 		var token = data.token;
