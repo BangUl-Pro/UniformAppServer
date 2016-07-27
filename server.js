@@ -314,7 +314,8 @@ function signIn (socket, data) {
 				'kakao_id' : kakao_id,
 				'kakao_nickname' : kakao_nickname,
 				'kakao_thumbnail_image' : kakao_thumbnail_image,
-				'kakao_profile_image' : kakao_profile_image
+				'kakao_profile_image' : kakao_profile_image,
+				'user_has_extra_profile' : false
 			};
 			
 			mySqlConnection.query('INSERT INTO users set ?', inputData, function(err, result) {
