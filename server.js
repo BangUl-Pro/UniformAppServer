@@ -1240,6 +1240,8 @@ io.on('connection', function(socket) {
 		var id = data.id;
 		var type = data.type;
 		
+		console.log('type = ' + type);
+
 		if (!id || !type) {
 			console.error('데이터 누락');
 			socket.emit('getTimelineComment', {
@@ -1269,7 +1271,9 @@ io.on('connection', function(socket) {
 		var userId = data.user_id;
 		var time = new Date();
 		var type = data.type;
-				
+
+		console.log('type = ' + type);
+
 		if (!timelineId || !content || !userId || !type) {
 			console.error('타임라인에 댓글달기 데이터 누락');
 			socket.emit('insertTimelineComment', {
