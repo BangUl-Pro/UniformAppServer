@@ -356,7 +356,6 @@ function signIn (socket, data) {
 			
 			mySqlConnection.query('INSERT INTO users set ?', inputData, function(err, result) {
 				if (err) {
-					console.error('회원가입 DB Insert 에러 = ' + err);
 					socket.emit('signUp', {
 						'code' : 412,
 						'userType' : 1
@@ -364,13 +363,11 @@ function signIn (socket, data) {
 				} else {
 					mySqlConnection.query('SELECT * FROM users WHERE user_id = "' + user_id + '";', function(err, userResult) {
 						if (err) {
-							console.info('회원가입 쿼리에러 = ' + err);
 							socket.emit('signUp', {
 								'code' : 413,
 								'userType' : userType
 							});
 						} else {
-							console.info('userResut = ' + JSON.stringify(userResult[0]));
 							socket.emit('signUp', {
 								'code' : 200,
 								'userType' : userType,
@@ -389,12 +386,7 @@ io.on('connection', function(socket) {
 		var id = data.id;
 		var deviceId = data.deviceId;
 
-		console.log('setDeviceId');
-		console.log('setDeviceId id = ' + id);
-		console.log('setDeviceId deviceId = ' + deviceId);
-
 		if (!id) {
-			console.log('setDeviceId 데이터 누락.');
 			socket.emit('setDeviceId', {
 				'code' : 999
 			});
@@ -405,12 +397,10 @@ io.on('connection', function(socket) {
 
 			mySqlConnection.query('UPDATE users SET ? WHERE user_id = "' + id + '"', inputData, function(err) {
 				if (err) {
-					console.log('setDeviceId 에러 : ' + err);
 					socket.emit('setDeviceId', {
 						'code' : 998
 					});
 				} else {
-					console.log('setDeviceId 성공.');
 					socket.emit('setDeviceId', {
 						'code' : 200
 					});
@@ -422,9 +412,7 @@ io.on('connection', function(socket) {
 	socket.on('addDeviceId', function(data) {
 		mySqlConnection.query('ALTER TABLE users ADD COLUMN user_device_id VARCHAR(100);', function(err) {
 			if (err) {
-				console.log("device id 컬럼 추가 실패.");
-			} else {
-				console.log('device id 컬럼 추가 성공.');
+				console.log("addDeviceId err = " + err);
 			}
 		});
 	});
@@ -435,8 +423,6 @@ io.on('connection', function(socket) {
 		mySqlConnection.query('create table if not exists schools (school_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, school_schoolname TEXT, school_address TEXT, school_city TEXT, school_category TEXT, school_gu TEXT, school_point INT NOT NULL);', function(err, result) {
 			if (err) {
 				console.error('school db 생성 에러 = ' + err);
-			} else {
-				console.log('school db 생성');
 			}
 		});
 	});
@@ -446,8 +432,6 @@ io.on('connection', function(socket) {
 		mySqlConnection.query('create table if not exists users (user_id VARCHAR(100) NOT NULL, user_name TEXT, user_has_extra_profile BOOLEAN NOT NULL, user_phone TEXT, user_picture TEXT, user_real_name TEXT, user_school_id INT, user_sex INT, user_user_type INT, user_token TEXT, user_device_id VARCHAR(100), kakao_thumbnail_image TEXT, kakao_profile_image TEXT, kakao_nickname TEXT, kakao_id INT, PRIMARY KEY (user_id));', function(err, result) {
 			if (err) {
 				console.error('user db 생성 에러 = ' + err);
-			} else {
-				console.log('user db 생성');
 			}
 		});
 	});
@@ -461,8 +445,6 @@ io.on('connection', function(socket) {
 			mySqlConnection.query('INSERT INTO users set ?', inputData, function(err) {
 				if (err) {
 					console.error('error = ' + err);
-				} else {
-					console.log('insert user 성공 = ' + inputData.id);
 				}
 			});
 	});
@@ -473,8 +455,6 @@ io.on('connection', function(socket) {
 		mySqlConnection.query('create table if not exists kakaos (id INT, user_id TEXT, token TEXT, nickname TEXT, profileImage TEXT, thumbnail_image TEXT, PRIMARY KEY (user_id, token));', function(err, result) {
 			if (err) {
 				console.error('kakao db 생성 에러 = ' + err);
-			} else {
-				console.log('kakao db 생성');
 			}
 		});
 	});
@@ -730,9 +710,6 @@ io.on('connection', function(socket) {
 		// 로그인
 		var user_id = data.user_id;
 		
-		console.log('로그인');
-		console.info('user_id = ' + user_id);
-		
 		if (!user_id) {
 			// 값 누락
 			console.error('값 누락');
@@ -747,7 +724,6 @@ io.on('connection', function(socket) {
 						'code' : 421
 					});
 				} else {
-					console.info('로그인 userResult = ' + JSON.stringify(userResult[0]));
 					socket.emit('signIn', {
 						'code' : 200,
 						'user' : userResult[0]
@@ -777,7 +753,6 @@ io.on('connection', function(socket) {
 						'code' : 501
 					});
 				} else {
-					console.log('성공.');
 					socket.emit('setHasExtraProfile', {
 						'code' : 200
 					});
@@ -789,10 +764,6 @@ io.on('connection', function(socket) {
 	socket.on('setToken', function(data) {
 		var id = data.id;
 		var token = data.token;
-
-		console.log('setToken');
-		console.log('setToken id = ' + id);
-		console.log('setToken token = ' + token);
 
 		if (!id) {
 			console.log('setToken 데이터 누락.');
@@ -811,7 +782,6 @@ io.on('connection', function(socket) {
 						'code' : 998
 					});
 				} else {
-					console.log('setToken 성공.');
 					socket.emit('setToken', {
 						'code' : 200
 					});
@@ -823,10 +793,6 @@ io.on('connection', function(socket) {
 	socket.on('sendGcm', function(data) {
 		var id = data.id;
 		var msg = data.msg;
-
-		console.log('sendGcm');
-		console.log('sendGcm id = ' + id);
-		console.log('sendGcm msg = ' + msg);
 
 		if (!id) {
 			console.log('sendGcm 데이터 누락.');
@@ -841,7 +807,6 @@ io.on('connection', function(socket) {
 						'code' : 998
 					});
 				} else {
-					console.log('result = ' + result[0].user_token);
 					
 					var message = new gcm.Message({
 					    collapseKey: 'uniform',
@@ -858,8 +823,6 @@ io.on('connection', function(socket) {
 					sender.send(message, registrationIds, 4, function(err, result) {
 						if (err) {
 							console.log('gcm error = ' + err);
-						} else {
-							console.log('gcm = ' + JSON.stringify(result));
 						}
 					});
 				}
@@ -870,10 +833,7 @@ io.on('connection', function(socket) {
 	socket.on('getSchoolRanking', function(data) {
 		var schoolId = data.school_id;
 
-		console.log('schoolId = ' + schoolId);
-
 		// 학교 랭킹 요청
-		console.log('학교랭킹 요청');
 		if (schoolId) {
 			mySqlConnection.query('select * from schools WHERE school_id = ' + schoolId, function(err, result) {
 				if (err) {
@@ -882,7 +842,6 @@ io.on('connection', function(socket) {
 						'code' : 430
 					});
 				} else {
-					console.info('학교 랭킹 요청 성공');
 					socket.emit('getSchoolRanking', {
 						'code' : 200,
 						'school' : result
@@ -897,7 +856,6 @@ io.on('connection', function(socket) {
 						'code' : 430
 					});
 				} else {
-					console.info('학교 랭킹 요청 성공');
 					socket.emit('getSchoolRanking', {
 						'code' : 200,
 						'school' : result
@@ -911,7 +869,6 @@ io.on('connection', function(socket) {
 		var schoolId = data.school_id;
 		
 		// 학교 랭킹 요청
-		console.log('내 학교랭킹 요청');
 		mySqlConnection.query('set @a=0;', function(err) {
 			if (err) {
 				console.log('set @a=0 error ' + err);
@@ -925,7 +882,6 @@ io.on('connection', function(socket) {
 					'code' : 430
 				});
 			} else {
-				console.info('내 학교 랭킹 요청 성공 = ' + JSON.stringify(result));
 				socket.emit('getMySchoolRanking', {
 					'code' : 200,
 					'rank' : result[0]
@@ -936,22 +892,13 @@ io.on('connection', function(socket) {
 	
 	
 	socket.on('insertSchool', function(data) {
-		console.log('학교 DB입력');
-		console.info('data = ' + data);
 		for(var i = 0; i < data.length; i++) {
 			var json = data[i];
-//			console.info('json = ' + json);
 			var schoolName = json.schoolname;
 			var address = json.address;
 			var city = json.city;
 			var category = json.category;
 			var gu = json.gu;
-			
-			console.info('학교 DB입력 schoolName = ' + schoolName);
-			console.info('학교 DB입력 address = ' + address);
-			console.info('학교 DB입력 city = ' + city);
-			console.info('학교 DB입력 category = ' + category);
-			console.info('학교 DB입력 gu = ' + gu);
 			
 			if (!id || !schoolName || !address || !city || !category || !gu) {
 				console.error('값 누락');
@@ -968,8 +915,6 @@ io.on('connection', function(socket) {
 			mySqlConnection.query('INSERT INTO schools set ?', inputData, function(err) {
 				if (err) {
 					console.error(err);
-				} else {
-					console.log('성공');
 				}
 			});
 		}
@@ -1010,13 +955,6 @@ io.on('connection', function(socket) {
 		var size = data.size;
 		var position = data.position;
 		
-		console.log('제품 검색 ');
-		console.info('제품 검색 school_id = ' + school_id);
-		console.info('제품 검색 sex = ' + sex);
-		console.info('제품 검색 category = ' + category);
-		console.info('제품 검색 size = ' + size);
-		console.info('제품 검색 position = ' + position);
-		
 		if (!school_id || !sex || !category || !size || !position) {
 			// 값 누락
 			console.error('제품 검색 값 누락');
@@ -1024,18 +962,15 @@ io.on('connection', function(socket) {
 				'code' : 440
 			});
 		} else {
-			console.log('제품 검색 한다');
 			if (size == -1 && category == -1) {
 				mySqlConnection.query('SELECT * FROM files RIGHT OUTER JOIN (SELECT * FROM products JOIN transactions ON products.product_school_id = ' + school_id + ' AND products.product_sex = ' + sex + ' AND products.product_id = transactions.transaction_product_id LIMIT 10 OFFSET ' + (position - 1) * 10 + ')' +
 						'as products ON products.product_id = files.file_parent_id AND files.file_type = 1 ORDER BY products.product_id;', function(err, productResult) {
-					console.log('사이즈 전부, 카테고리 전부 검색');
 					if (err) {
 						console.error('제품 검색 에러 = ' + err);
 						socket.emit('searchProduct', {
 							'code' : 441
 						});
 					} else {
-						console.log('제품 검색 성공 = ' + JSON.stringify(productResult));
 						socket.emit('searchProduct', {
 							'code' : 200,
 							'product' : productResult
@@ -1045,14 +980,12 @@ io.on('connection', function(socket) {
 			} else if (size == -1) {
 				mySqlConnection.query('SELECT * FROM files RIGHT OUTER JOIN (SELECT * FROM products JOIN transactions ON products.product_school_id = ' + school_id + ' AND products.product_sex = ' + sex + ' AND products.product_id = transactions.transaction_product_id AND products.product_category = ' + category + ' LIMIT 10 OFFSET ' + (position - 1) * 10 + ')' +
 						'as products ON products.product_id = files.file_parent_id AND files.file_type = 1;', function(err, productResult) {
-					console.log('사이즈 전부 검색');
 					if (err) {
 						console.error('제품 검색 에러 = ' + err);
 						socket.emit('searchProduct', {
 							'code' : 441
 						});
 					} else {
-						console.log('제품 검색 성공');
 						socket.emit('searchProduct', {
 							'code' : 200,
 							'product' : productResult
@@ -1067,14 +1000,12 @@ io.on('connection', function(socket) {
 				' AND products.product_size = ' + size +
 				' LIMIT 10 OFFSET ' + (position - 1) * 10 + ')' +
 				'as products ON products.product_id = files.file_parent_id AND files.file_type = 1;', function(err, productResult) {
-					console.log('카테고리 전부 검색');
 					if (err) {
 						console.error('제품 검색 에러 = ' + err);
 						socket.emit('searchProduct', {
 							'code' : 441
 						});
 					} else {
-						console.log('제품 검색 성공');
 						socket.emit('searchProduct', {
 							'code' : 200,
 							'product' : productResult
@@ -1082,7 +1013,6 @@ io.on('connection', function(socket) {
 					}
 				});
 			} else {
-				console.log('제품 검색 ㅇㅇ');
 				mySqlConnection.query('SELECT * FROM files RIGHT OUTER JOIN (SELECT * FROM products JOIN transactions ON products.product_school_id = ' + school_id + ' AND products.product_sex = ' + sex + 
 						' AND products.product_id = transactions.transaction_product_id AND products.product_size = ' + size + ' AND products.product_category = ' + category + ' LIMIT 10 OFFSET ' + (position - 1) * 10 + ')' +
 						'as products ON products.product_id = files.file_parent_id AND files.file_type = 1;', function(err, productResult) {
@@ -1092,7 +1022,6 @@ io.on('connection', function(socket) {
 							'code' : 441
 						});
 					} else {
-						console.log('제품 검색 성공');
 						socket.emit('searchProduct', {
 							'code' : 200,
 							'product' : productResult
@@ -1109,12 +1038,7 @@ io.on('connection', function(socket) {
 		var id = data.id;
 		var phone = data.phone;
 		var schoolId = data.schoolId;
-		
-		console.log('유저 프로필 업데이트 ');
-		console.info('유저 프로필 업데이트 id = ' + id);
-		console.info('유저 프로필 업데이트 phone = ' + phone);
-		console.info('유저 프로필 업데이트 schoolId = ' + schoolId);
-		
+				
 		if (!id || !phone || !schoolId) {
 			console.error('유저 프로필 업데이트 데이터 누락');
 			socket.emit('updateUserProfile', {
@@ -1140,7 +1064,6 @@ io.on('connection', function(socket) {
 								'code' : 462
 							});
 						} else {
-							console.log('유저 프로필 업데이트 성공 = ' + JSON.stringify(result));
 							socket.emit('updateUserProfile', {
 								'code' : 200,
 								'user' : result[0]
@@ -1158,12 +1081,7 @@ io.on('connection', function(socket) {
 		var school_id = data.product_school_id;
 		var category = data.product_category;
 		var created = data.product_created;
-		
-		console.log('getProduct ');
-		console.info('getProduct school_id = ' + school_id);
-		console.info('getProduct category = ' + category);
-		console.info('getProduct created = ' + created);
-		
+				
 		if (!school_id || !category  || !created) {
 			// 값 누락
 			console.error('getProduct 값 누락');
@@ -1171,9 +1089,6 @@ io.on('connection', function(socket) {
 				'code' : 800
 			});
 		} else {
-			console.log('getProduct 한다');
-
-
 			mySqlConnection.query('SELECT * FROM files RIGHT OUTER JOIN (SELECT * FROM products JOIN transactions ON products.product_school_id = ' + school_id +
 				' AND products.product_id = transactions.transaction_product_id' + 
 				' AND products.product_category = ' + category +
@@ -1185,7 +1100,6 @@ io.on('connection', function(socket) {
 							'code' : 801
 						});
 					} else {
-						console.log('getProduct 성공 ' + JSON.stringify(productResult));
 						socket.emit('getProduct', {
 							'code' : 200,
 							'product' : productResult
@@ -1202,13 +1116,6 @@ io.on('connection', function(socket) {
 		var user_id = data.user_id;
 		var date = new Date();
 		var files = data.file;
-		
-		console.log('타임라인 글 쓰기');
-		console.info('school_id = ' + school_id);
-		console.info('user_id = ' + user_id);
-		console.info('timelineContent = ' + timelineContent);
-		console.info('date = ' + date.getTime());
-		console.info('files = ' + files);
 		
 		if (!school_id || !timelineContent || !user_id) {
 			// 값 누락
@@ -1230,7 +1137,6 @@ io.on('connection', function(socket) {
 						'code' : 471
 					});
 				} else {
-					console.log('타임라인 글 쓰기 성공');
 					mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = "' + user_id + '" AND timelines.timeline_school_id = ' + school_id + ' AND timelines.timeline_content = "' + timelineContent + '"' + ' AND timelines.timeline_user_id = users.user_id LIMIT 1;', function(err, timelineResult) {
 						if (err) {
 							console.error('타임라인 결과값 확인 에러 = ' + err);
@@ -1238,7 +1144,6 @@ io.on('connection', function(socket) {
 								'code' : 472
 							});
 						} else {
-							console.log('timelineResult = ' + timelineResult[0]);
 							socket.emit('insertTimeline', {
 								'code' : 200,
 								'timeline' : timelineResult[0]
@@ -1257,13 +1162,7 @@ io.on('connection', function(socket) {
 		var nickName = data.nickName;
 		var profileImage = data.profileImage;
 		var thumbnailImage = data.thumbnailImage;
-		
-		console.log('카카오 로그인 ');
-		console.info('카카오 로그인 id = ' + id);
-		console.info('카카오 로그인 nickName = ' + nickName);
-		console.info('카카오 로그인 profileImage = ' + profileImage);
-		console.info('카카오 로그인 thumbnailImage = ' + thumbnailImage);
-		
+				
 		// if (!id || !nickName) {
 		if (!id) {	
 			console.error('카카오 로그인 데이터 누락');
@@ -1278,8 +1177,6 @@ io.on('connection', function(socket) {
 						'code' : 481
 					});
 				} else {
-					console.log('카카오 로그인 userResult = ' + JSON.stringify(userResult[0]));
-					
 					if (!userResult[0]) {
 						// 유저 정보 없음
 						console.error('유저 정보 없음');
@@ -1294,7 +1191,6 @@ io.on('connection', function(socket) {
 						
 						signIn(socket, signInData);
 					} else {
-						console.log('성공');
 						socket.emit('signInKakao', {
 							'code' : 200,
 							'user' : userResult[0]
@@ -1309,8 +1205,6 @@ io.on('connection', function(socket) {
 		mySqlConnection.query('UPDATE schools SET school_point = 0', function(err) {
 			if (err) {
 				console.log('스쿨업데이트 에러 = ' + err);
-			} else {
-				console.log('스쿨업데이트 성공');
 			}
 		});
 	});
@@ -1320,12 +1214,7 @@ io.on('connection', function(socket) {
 		var school_id = data.school_id;
 		var userId = data.user_id;
 		var time = data.time;
-		
-		console.log('타임라인 모두 받아오기');
-		console.info('school_id = ' + school_id);
-		console.info('userId = ' + userId);
-		console.info('time = ' + time);
-		
+				
 		if (!school_id || !userId) {
 			console.error('데이터 누락');
 			socket.emit('getAllTimeline', {
@@ -1345,7 +1234,6 @@ io.on('connection', function(socket) {
 						'code' : 501
 					});
 				} else {
-					console.log('timelineResult = ' + timelineResult);
 					socket.emit('getAllTimeline', {
 						'code' : 200,
 						'timeline' : timelineResult
@@ -1359,11 +1247,7 @@ io.on('connection', function(socket) {
 	socket.on('getMyTimeline', function(data) {
 		var userId = data.user_id;
 		var schoolId = data.school_id;
-		
-		console.log('내가 쓴 타임라인 요청');
-		console.info('userId = ' + userId);
-		console.info('schoolId = ' + schoolId);
-		
+				
 		if (!userId || !schoolId) {
 			console.error('데이터 누락');
 			socket.emit('getMyTimeline', {
@@ -1380,7 +1264,6 @@ io.on('connection', function(socket) {
 						'code' : 511
 					});
 				} else {
-					console.log('내가 쓴 타임라인 요청 성공 ' + JSON.stringify(timelineResult));
 					socket.emit('getMyTimeline', {
 						'code' : 200,
 						'timeline' : timelineResult
@@ -1393,9 +1276,6 @@ io.on('connection', function(socket) {
 	
 	socket.on('getTimelineComment', function(data) {
 		var id = data.id;
-		
-		console.log('타임라인 댓글 요청');
-		console.info('id = ' + id);
 		
 		if (!id) {
 			console.error('데이터 누락');
@@ -1410,7 +1290,6 @@ io.on('connection', function(socket) {
 						'code' : 521
 					});
 				} else {
-					console.log('댓글 요청 성공');
 					socket.emit('getTimelineComment', {
 						'code': 200,
 						'timelineComment' : commentResult
@@ -1426,13 +1305,7 @@ io.on('connection', function(socket) {
 		var content = data.commentContent;
 		var userId = data.user_id;
 		var time = new Date();
-		
-		console.log('타임라인에 댓글달기 ');
-		console.log('타임라인에 댓글달기 timelineId = ' + timelineId);
-		console.log('타임라인에 댓글달기 content = ' + content);
-		console.log('타임라인에 댓글달기 time = ' + time.getTime());
-		console.log('타임라인에 댓글달기 userId = ' + userId);
-		
+				
 		if (!timelineId || !content || !userId) {
 			console.error('타임라인에 댓글달기 데이터 누락');
 			socket.emit('insertTimelineComment', {
