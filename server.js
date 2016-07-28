@@ -104,16 +104,6 @@ app.post('/api/photo', function(req, res) {
 		} else {
 			var parentId = req.headers.parent_id;
 			var type = req.headers.file_type;
-			console.log('파일 입력 ');
-			console.log('파일 입력 fieldname = ' + req.file.fieldname);
-			console.log('파일 입력 originalname = ' + req.file.originalname);
-			console.log('파일 입력 encoding = ' + req.file.encoding);
-			console.log('파일 입력 destination = ' + req.file.destination);
-			console.log('파일 입력 filename = ' + req.file.filename);
-			console.log('파일 입력 path = ' + req.file.path);
-			console.log('파일 입력 size = ' + req.file.size);
-			console.log('파일 입력 parentId = ' + parentId);
-			console.log('파일 입력 file_type = ' + type);
 
 			if (req.file.fieldname && req.file.originalname && req.file.encoding &&
 				req.file.destination && req.file.filename && req.file.path &&
@@ -130,7 +120,6 @@ app.post('/api/photo', function(req, res) {
 						res.writeHead(201);
 						res.end('에러');
 					} else {
-						console.log('파일 입력 성공');
 						res.writeHead(200);
 						res.end('성공');
 
@@ -153,7 +142,6 @@ app.get('/imgs/:fileName', function(req, res) {
 		if (err) {
 			console.error('get ./images Error = ' + err);
 		} else {
-			console.log('./images = ' + req.params.fileName);
 
 			gfs.exist({filename: req.params.fileName}, function(err, found) {
 				if (err) {
@@ -170,7 +158,6 @@ app.get('/imgs/:fileName', function(req, res) {
 				gfs.createReadStream({
 				     filename: req.params.fileName
 				}).pipe(res);
-				console.log('image 로딩 성공.');
 			});
 		}
 	});
@@ -179,9 +166,7 @@ app.get('/imgs/:fileName', function(req, res) {
 
 app.post('/insertSchool', function(req, res) {
 	var data = req.headers.schools;
-	console.log('data = ' + data);
 	var json = encodeURI(data);
-//	console.log('json = ' + json);
 	
 	var jsonData = JSON.parse(data);
 	
@@ -190,13 +175,7 @@ app.post('/insertSchool', function(req, res) {
 	var city = decodeURIComponent(jsonData.school_city);
 	var category = decodeURIComponent(jsonData.school_category);
 	var gu = decodeURIComponent(jsonData.school_gu);
-	
-	console.info('학교 DB입력 schoolName = ' + schoolName);
-	console.info('학교 DB입력 address = ' + address);
-	console.info('학교 DB입력 city = ' + city);
-	console.info('학교 DB입력 category = ' + category);
-	console.info('학교 DB입력 gu = ' + gu);
-	
+		
 	if (!schoolName || !address || !city || !category || !gu) {
 		console.error('값 누락');
 		res.end('값 누락');
@@ -216,7 +195,6 @@ app.post('/insertSchool', function(req, res) {
 			console.error('학교 DB입력 실패 = ' + err);
 		} else {
 			res.end('성공');
-			console.log('학교 DB입력 성공');
 		}
 	});
 });
@@ -245,19 +223,7 @@ function signIn (socket, data) {
 	var kakao_nickname = data.kakao_nickname;
 	var kakao_thumbnail_image = data.kakao_thumbnail_image;
 	var kakao_profile_image = data.kakao_profile_image;
-	
-	console.log('회원가입 ');
-	console.info('회원가입 user_id = ' + user_id);
-	console.info('회원가입 realName = ' + realName);
-	console.info('회원가입 sex = ' + sex);
-	console.info('회원가입 userType = ' + userType);
-	console.info('회원가입 phone = ' + phone);
-	console.info('회원가입 school_id = ' + school_id);
-	console.info('회원가입 kakao_id = ' + kakao_id);
-	console.info('회원가입 kakao_nickname = ' + kakao_nickname);
-	console.info('회원가입 kakao_thumbnail_image = ' + kakao_thumbnail_image);
-	console.info('회원가입 kakao_profile_image = ' + kakao_profile_image);
-	
+		
 	if (!user_id) {
 		// 값 누락
 		socket.emit('signUp', {
@@ -295,7 +261,6 @@ function signIn (socket, data) {
 								'code' : 413
 							});
 						} else {
-							console.log('회원가입 성공 = ' + JSON.stringify(result[0]));
 							socket.emit('signUp', {
 								'code' : 200,
 								'userType' : userType,
@@ -307,7 +272,6 @@ function signIn (socket, data) {
 			});
 		} else if (kakao_id || kakao_nickname || kakao_profile_image || kakao_thumbnail_image) {
 			// 카카오 
-			console.log('카카오 회원가입');
 			var inputData = {
 				'user_id' : user_id,
 				'user_user_type' : userType,
@@ -334,7 +298,6 @@ function signIn (socket, data) {
 								'userType' : userType
 							});
 						} else {
-							console.info('userResut = ' + JSON.stringify(userResult[0]));
 							socket.emit('signInKakao', {
 								'code' : 200,
 								'userType' : userType,
@@ -347,7 +310,6 @@ function signIn (socket, data) {
 				
 		} else {
 			// 게스트
-			console.log('게스트 가입');
 			var date = Date.now();
 			var inputData = {
 				'user_id' : user_id,
@@ -1326,7 +1288,6 @@ io.on('connection', function(socket) {
 						'code' : 531
 					});
 				} else {
-					console.log('타임라인에 댓글달기 성공');
 					socket.emit('insertTimelineComment', {
 						'code' : 200
 					});
@@ -1339,11 +1300,7 @@ io.on('connection', function(socket) {
 	socket.on('deleteTimeline', function(data) {
 		var timelineId = data.timelineItemId;
 		var userId = data.user_id;
-		
-		console.log('타임라인 지우기');
-		console.info('timelineId = ' + timelineId);
-		console.info('userId = ' + userId);
-		
+				
 		if (!timelineId || !userId) {
 			console.error('데이터 누락');
 			socket.emit('deleteTimeline', {
@@ -1364,7 +1321,6 @@ io.on('connection', function(socket) {
 								'code' : 542
 							});
 						} else {
-							console.log('타임라인 지우기 성공');
 							socket.emit('deleteTimeline', {
 								'code' : 200
 							});
@@ -1382,13 +1338,7 @@ io.on('connection', function(socket) {
 		var userId = timelineData.user_id;
 		var content = timelineData.contents;
 		var schoolId = timelineData.school_id;
-		
-		console.log('타임라인 업데이트');
-		console.info('id = ' + id);
-		console.info('userId = ' + userId);
-		console.info('content = ' + content);
-		console.info('schoolId = ' + schoolId);
-		
+				
 		if (!id || !userId || !content || !schoolId) {
 			console.error('데이터 누락');
 			socket.emit('updateTimeline', {
@@ -1405,7 +1355,6 @@ io.on('connection', function(socket) {
 						'code' : 551
 					});
 				} else {
-					console.log('타임라인 업데이트 성공');
 					mySqlConnection.query('SELECT * FROM timelines JOIN users ON timelines.timeline_user_id = "' + userId + '" AND timelines.timeline_school_id = ' + schoolId + ' AND timelines.timeline_content = "' + content + '"' + ' AND timelines.timeline_user_id = users.user_id LIMIT 1;', function(err, timelineResult) {
 						if (err) {
 							console.error('타임라인 결과값 확인 에러 = ' + err);
@@ -1413,7 +1362,6 @@ io.on('connection', function(socket) {
 								'code' : 552
 							});
 						} else {
-							console.log('timelineResult = ' + JSON.stringify(timelineResult[0]));
 							socket.emit('updateTimeline', {
 								'code' : 200,
 								'timeline' : timelineResult[0]
@@ -1430,10 +1378,7 @@ io.on('connection', function(socket) {
 		var timelineItemId = data.timelineItemId;
 		var userId = data.user_id;
 		
-		console.log('좋아요 입력');
-		console.info('timelineItemId = ' + timelineItemId);
-		console.info('userId = ' + userId);
-		
+			
 		if (!timelineItemId || !userId) {
 			console.error('데이터 누락');
 			socket.emit('insertLike', {
@@ -1451,7 +1396,6 @@ io.on('connection', function(socket) {
 						'code' : 561
 					});
 				} else {
-					console.log('좋아요 입력 성공');
 					mySqlConnection.query('SELECT * FROM likes WHERE like_timeline_id = ' + timelineItemId + ' AND like_user_id = "' + userId + '" LIMIT 1;', function(err, likeResult) {
 						if (err) {
 							console.error('좋아요 입력 쿼리 에러 = ' + err);
@@ -1459,7 +1403,6 @@ io.on('connection', function(socket) {
 								'code' : 562
 							});
 						} else {
-							console.info('likeResult = ' + likeResult[0]);
 							socket.emit('insertLike', {
 								'code' : 200,
 								'like' : likeResult[0]
@@ -1476,12 +1419,7 @@ io.on('connection', function(socket) {
 		var id = data.id;
 		var timelineId = data.timeline_id;
 		var userId = data.user_id;
-		
-		console.log('좋아요 지우기');
-		console.info('id = ' + id);
-		console.info('timelineId = ' + timelineId);
-		console.info('userId = ' + userId);
-		
+				
 		if (!id || !timelineId || !userId) {
 			console.error('데이터 누락');
 			socket.emit('deleteLike', {
@@ -1495,7 +1433,6 @@ io.on('connection', function(socket) {
 						'code' : 571
 					});
 				} else {
-					console.log('좋아요 지우기 성공');
 					socket.emit('deleteLike', {
 						'code' : 200
 					});
@@ -1509,12 +1446,7 @@ io.on('connection', function(socket) {
 		var id = data.id;
 		var timelineItemId = data.timelineItemId;
 		var userId = data.user_id;
-		
-		console.log('댓글 지우기');
-		console.info('id = ' + id);
-		console.info('timelineItemId = ' + timelineItemId);
-		console.info('userId = ' + userId);
-		
+				
 		if (!id || !timelineItemId || !userId) {
 			console.error('데이터 누락');
 			socket.emit('deleteComment', {
@@ -1528,7 +1460,6 @@ io.on('connection', function(socket) {
 						'code' : 581
 					});
 				} else {
-					console.log('댓글 지우기 성공');
 					socket.emit('deleteComment', {
 						'code' : 200
 					});
@@ -1547,18 +1478,7 @@ io.on('connection', function(socket) {
 		var sex = data.sex;
 		var size = data.size;
 		var category = data.category;
-		
-		console.log('제품 입력 ');
-		console.log('제품 입력 user_id = ' + user_id);
-		console.log('제품 입력 product_name = ' + product_name);
-		console.log('제품 입력 content = ' + content);
-		console.log('제품 입력 created = ' + created);
-		console.log('제품 입력 condition = ' + condition);
-		console.log('제품 입력 school_id = ' + school_id);
-		console.log('제품 입력 sex = ' + sex);
-		console.log('제품 입력 size = ' + size);
-		console.log('제품 입력 category = ' + category);
-		
+				
 		if (!user_id || !product_name || !created || !condition || !school_id || !sex || !size || !category) {
 			console.error('제품 입력 데이터 누락');
 			socket.emit('insertProduct', {
@@ -1600,7 +1520,6 @@ io.on('connection', function(socket) {
 										'code' : 593
 									});
 								} else {
-									console.log('제품 입력 성공');
 									socket.emit('insertProduct', {
 										'code' : 200,
 										'product' : result[0]
@@ -1619,11 +1538,7 @@ io.on('connection', function(socket) {
 	socket.on('getMyProduct', function(data) {
 		var donatorId = data.transaction_donator_id;
 		var receiverId = data.transaction_receiver_id;
-		
-		console.log('내 제품 받아오기');
-		console.info('donatorId = ' + donatorId);
-		console.info('receiverId = ' + receiverId);
-		
+				
 		if (!donatorId || !receiverId) {
 			console.error('데이터 누락');
 			socket.emit('getMyProduct', {
@@ -1638,14 +1553,12 @@ io.on('connection', function(socket) {
 						'code' : 601
 					});
 				} else {
-					console.log('내 제품 결과 = ' + JSON.stringify(productResult));
-					console.log('내 제품 요청 성공');
 					socket.emit('getMyProduct', {
 						'code' : 200,
 						'product' : productResult
 					});
 				}
-			});
+			}); 
 		}
 	});
 	
@@ -1669,18 +1582,7 @@ io.on('connection', function(socket) {
 		
 		var isDeleteFile = data.isDeleteFile;
 		
-		
-		console.log('제품 업데이트 ');
-		console.log('제품 업데이트 user_id = ' + user_id);
-		console.log('제품 업데이트 product_name = ' + product_name);
-		console.log('제품 업데이트 content = ' + content);
-		console.log('제품 업데이트 created = ' + created);
-		console.log('제품 업데이트 condition = ' + condition);
-		console.log('제품 업데이트 school_id = ' + school_id);
-		console.log('제품 업데이트 sex = ' + sex);
-		console.log('제품 업데이트 size = ' + size);
-		console.log('제품 업데이트 category = ' + category);
-		
+				
 		if (!user_id || !product_name || !content || !created || !condition || !school_id || !sex || !size || !category) {
 			console.error('제품 업데이트 데이터 누락');
 			socket.emit('updateProduct', {
@@ -1714,7 +1616,6 @@ io.on('connection', function(socket) {
 								'code' : 612
 							});
 						} else {
-							console.log('productResult = ' + JSON.stringify(productResult));
 							
 							if (isDeleteFile) {
 								mySqlConnection.query('DELETE FROM files WHERE file_parent_id = ' + productResult[0].product_id, function(err) {
@@ -1724,7 +1625,6 @@ io.on('connection', function(socket) {
 											'code' : 613
 										});
 									} else {
-										console.log('제품 업데이트 성공');
 										socket.emit('updateProduct', {
 											'code' : 200,
 											'product' : productResult[0]
@@ -1732,7 +1632,6 @@ io.on('connection', function(socket) {
 									}
 								});
 							} else {
-								console.log('제품 업데이트 성공');
 								socket.emit('updateProduct', {
 									'code' : 200,
 									'product' : productResult[0]
@@ -1751,13 +1650,7 @@ io.on('connection', function(socket) {
 		var transactionJson = data.transaction;
 		var productId = transactionJson.product_id;
 		var receiverId = transactionJson.receiver_id;
-		
-		console.log('트랜잭션 상태 업데이트');
-		console.info('status = ' + status);
-		console.info('transactionJson = ' + transactionJson);
-		console.info('productId = ' + productId);
-		console.info('receiverId = ' + receiverId);
-		
+				
 		if (!status || !transactionJson || !productId || !receiverId) {
 			console.error('데이터 누락');
 			socket.emit('updateTransactionStatus', {
@@ -1783,7 +1676,6 @@ io.on('connection', function(socket) {
 								'code' : 622
 							});
 						} else {
-							console.log('트랜잭션 상태 업데이트 성공');
 							socket.emit('updateTransactionStatus', {
 								'code' : 200,
 								'transaction' : transactionResult[0]
@@ -1799,7 +1691,6 @@ io.on('connection', function(socket) {
 	
 	socket.on('deleteFile', function(data) {
 		var files = data.files;
-		console.log('파일 지우기');
 		if (!files) { 
 			console.error('데이터누락');
 			socket.emit('delteFile', {
@@ -1809,7 +1700,6 @@ io.on('connection', function(socket) {
 			for (var i = 0; i < files.length; i++) {
 				var file = files[i];
 				var file_id = file.file_id;
-				console.info('file_id = ' + file_id);
 				
 				if (!file_id) {
 					console.error('데이터 누락');
@@ -1831,7 +1721,6 @@ io.on('connection', function(socket) {
 									'code' : 631
 								});
 							} else {
-								console.log('파일 지우기 성공');
 								socket.emit('deleteFile', {
 									'code' : 200
 								});
@@ -1850,14 +1739,7 @@ io.on('connection', function(socket) {
 		var receiver_id = data.receiver_id;
 		var product_id = data.product_id;
 		var product_name = data.product_name;
-		
-		console.log('트랜잭션 입력');
-		console.info('트랜잭션 입력 status = ' + status);
-		console.info('트랜잭션 입력 donator_id = ' + donator_id);
-		console.info('트랜잭션 입력 receiver_id = ' + receiver_id);
-		console.info('트랜잭션 입력 product_id = ' + product_id);
-		console.info('트랜잭션 입력 product_name = ' + product_name);
-		
+				
 		if (!status || !donator_id || !product_id || !product_name) {
 			console.error('트랜잭션 입력 데이터 누락');
 		} else {
@@ -1873,8 +1755,6 @@ io.on('connection', function(socket) {
 			mySqlConnection.query('INSERT INTO transactions SET ?', transactionInputData, function(err) {
 				if (err) {
 					console.error('트랜잭션 입력 에러 = ' + err);
-				} else {
-					console.log('트랜잭션 입력 성공');
 				}
 			});
 		}
@@ -1883,9 +1763,6 @@ io.on('connection', function(socket) {
 	
 	socket.on('deleteProduct', function(data) {
 		var productId = data.productId;
-		
-		console.log('제품 삭제');
-		console.info('productId = ' + productId);
 		
 		if (!productId) {
 			console.error('데이터 누락');
@@ -1900,7 +1777,6 @@ io.on('connection', function(socket) {
 						'code' : 651
 					});
 				} else {
-					console.log('제품 삭제 성공');
 					socket.emit('deleteProduct', {
 						'code' : 200
 					});
@@ -1912,10 +1788,7 @@ io.on('connection', function(socket) {
 	
 	socket.on('deleteUser', function(data) {
 		var userId = data.user_id;
-		
-		console.log('회원 탈퇴');
-		console.log('회원 탈퇴 userId = ' + userId);
-		
+				
 		if (!userId) {
 			console.log('유저 회원 탈퇴 데이터 누락');
 			socket.emit('deleteUser', {
@@ -1978,7 +1851,6 @@ io.on('connection', function(socket) {
 																	});
 																	mySqlConnection.rollback();
 																} else {
-																	console.log('회원 탈퇴 성공');
 																	socket.emit('deleteUser', {
 																		'code' : 200
 																	});
