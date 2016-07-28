@@ -457,7 +457,7 @@ io.on('connection', function(socket) {
 	
 	
 	socket.on('createComment', function(data) {
-		mySqlConnection.query('CREATE TABLE IF NOT EXISTS comments (comment_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, comment_timeline_item_id TEXT, comment_user_id TEXT, comment_created BIGINT, comment_content TEXT);', function(err) {
+		mySqlConnection.query('CREATE TABLE IF NOT EXISTS comments (comment_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, comment_timeline_item_id TEXT, comment_user_id TEXT, comment_created BIGINT, comment_content TEXT, comment_type INT);', function(err) {
 			if (err) {
 				console.error('댓글 테이블 생성 에러 = ' + err);
 			} else {
@@ -1238,14 +1238,15 @@ io.on('connection', function(socket) {
 	
 	socket.on('getTimelineComment', function(data) {
 		var id = data.id;
+		var type = data.type;
 		
-		if (!id) {
+		if (!id || !type) {
 			console.error('데이터 누락');
 			socket.emit('getTimelineComment', {
 				'code' : 520
 			});
 		} else {
-			mySqlConnection.query('SELECT * FROM comments JOIN users ON comments.comment_timeline_item_id = ' + id + ' AND comments.comment_user_id = users.user_id', function(err, commentResult) {
+			mySqlConnection.query('SELECT * FROM comments JOIN users ON comments.comment_timeline_item_id = ' + id + ' AND comments.comment_user_id = users.user_id AND comments.comment_type = ' + type, function(err, commentResult) {
 				if (err) {
 					console.error('댓글 요청 에러 = ' + err);
 					socket.emit('getTimelineComment', {
@@ -1267,8 +1268,9 @@ io.on('connection', function(socket) {
 		var content = data.commentContent;
 		var userId = data.user_id;
 		var time = new Date();
+		var type = data.type;
 				
-		if (!timelineId || !content || !userId) {
+		if (!timelineId || !content || !userId || !type) {
 			console.error('타임라인에 댓글달기 데이터 누락');
 			socket.emit('insertTimelineComment', {
 				'code' : 530
@@ -1278,7 +1280,8 @@ io.on('connection', function(socket) {
 				'comment_timeline_item_id' : timelineId,
 				'comment_content' : content,
 				'comment_created' : time.getTime(),
-				'comment_user_id' : userId
+				'comment_user_id' : userId,
+				'comment_type' : type
 			};
 			
 			mySqlConnection.query('INSERT INTO comments set ?', inputData, function(err) {
